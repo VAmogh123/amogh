@@ -1,0 +1,158 @@
+import java.util.*;
+
+class Bank {
+    private String name;
+    private List<Account> accounts;
+
+    public Bank(String name) {
+        this.name = name;
+        this.accounts = new ArrayList<>();
+    }
+
+    public Account createAccount(String owner, double initialBalance) {
+        Account account = new Account(owner, initialBalance);
+        accounts.add(account);
+        return account;
+    }
+
+    public Account getAccount(int accountNumber) {
+        for (Account account : accounts) {
+            if (account.getAccountNumber() == accountNumber) {
+                return account;
+            }
+        }
+        return null;
+    }
+
+    public List<Account> getAllAccounts() {
+        return accounts;
+    }
+}
+
+class Account {
+    private static int nextAccountNumber = 1;
+    private int accountNumber;
+    private String owner;
+    private double balance;
+    private List<Transaction> transactions;
+
+    public Account(String owner, double initialBalance) {
+        this.accountNumber = nextAccountNumber++;
+        this.owner = owner;
+        this.balance = initialBalance;
+        this.transactions = new ArrayList<>();
+        transactions.add(new Transaction("Initial deposit", initialBalance));
+    }
+
+    public int getAccountNumber() {
+        return accountNumber;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            transactions.add(new Transaction("Deposit", amount));
+        }
+    }
+
+    public boolean withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            transactions.add(new Transaction("Withdrawal", -amount));
+            return true;
+        }
+        return false;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+}
+
+class Transaction {
+    private String description;
+    private double amount;
+    private Date date;
+
+    public Transaction(String description, double amount) {
+        this.description = description;
+        this.amount = amount;
+        this.date = new Date();
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+}
+
+class Customer {
+    private String name;
+    private List<Account> accounts;
+
+    public Customer(String name) {
+        this.name = name;
+        this.accounts = new ArrayList<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void addAccount(Account account) {
+        accounts.add(account);
+    }
+
+    public List<Account> getAccounts() {
+        return accounts;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Bank bank = new Bank("MyBank");
+
+        Customer alice = new Customer("Alice");
+        Account aliceAccount = bank.createAccount("Alice", 1000.0);
+        alice.addAccount(aliceAccount);
+
+        Customer bob = new Customer("Bob");
+        Account bobAccount = bank.createAccount("Bob", 500.0);
+        bob.addAccount(bobAccount);
+
+        aliceAccount.deposit(200.0);
+        aliceAccount.withdraw(150.0);
+
+        bobAccount.deposit(300.0);
+        bobAccount.withdraw(100.0);
+
+        printAccountDetails(aliceAccount);
+        printAccountDetails(bobAccount);
+    }
+
+    public static void printAccountDetails(Account account) {
+        System.out.println("Account Number: " + account.getAccountNumber());
+        System.out.println("Owner: " + account.getOwner());
+        System.out.println("Balance: " + account.getBalance());
+        System.out.println("Transactions:");
+        for (Transaction transaction : account.getTransactions()) {
+            System.out.println("  " + transaction.getDate() + " - " + transaction.getDescription() + ": " + transaction.getAmount());
+        }
+        System.out.println();
+    }
+}
